@@ -2,6 +2,7 @@ package com.glassyzone.api;
 
 import java.util.List;
 
+import com.glassyzone.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +16,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.web.bind.annotation.*;
 import com.glassyzone.entity.Product;
 import com.glassyzone.repository.ProductDAO;
 
@@ -27,10 +31,8 @@ public class ProductRestController {
 	@Autowired
 	ProductDAO productDAO;
 
-	@GetMapping
-	public ResponseEntity<List<Product>> getAllProducts() {
-		return ResponseEntity.ok(productDAO.findAll());
-	}
+	@Autowired
+	ProductService productService;
 
 	@GetMapping("/sortAsc")
 	public ResponseEntity<List<Product>> sortAsc() {
@@ -50,7 +52,7 @@ public class ProductRestController {
 
 	@GetMapping("/search")
 	public ResponseEntity<List<Product>> searchProductByName(@RequestParam String name) {
-		List<Product> matchingProducts = productDAO.findByProductNameContainingIgnoreCase(name);
+		List<Product> matchingProducts = productDAO.findByNameContainingIgnoreCase(name);
 		if (!matchingProducts.isEmpty()) {
 			return ResponseEntity.ok(matchingProducts);
 		} else {
@@ -77,4 +79,16 @@ public class ProductRestController {
 			return ResponseEntity.notFound().build();
 		}
 	}
+
+	@GetMapping("/getTop3")
+	public ResponseEntity<List<Product>> findByTop3 (){
+		return ResponseEntity.ok(productDAO.findByTop3());
+	}
+
+	@GetMapping
+	public ResponseEntity<Page<Product>> getProducts(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "10") int size) {
+		Page<Product> productPage = productService.findPaginated(page, size);
+		return ResponseEntity.ok(productPage);
+	}
+
 }

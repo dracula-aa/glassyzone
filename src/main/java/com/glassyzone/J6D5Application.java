@@ -5,9 +5,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
-@ComponentScan(basePackages = "com.glassyzone") 
+@ComponentScan(basePackages = "com.glassyzone")
 public class J6D5Application {
-	public static void main(String[] args) {
+		public static void main(String[] args) {
 		SpringApplication.run(J6D5Application.class, args);
 	}
 }

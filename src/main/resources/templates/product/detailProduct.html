@@ -4,12 +4,12 @@
 <meta charset="UTF-8">
 <link rel="icon" href="/image/logo.png" type="image/x-icon">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title th:text="${detailProduct.productName}"></title>
+<title th:text="${detailProduct.name}"></title>
 <link th:insert="~{common/taglib  :: taglib}">
 <style>
 </style>
 </head>
-<body  ng-app="shopping-cart-app" ng-controller="shopping-cart-ctrl">
+<body ng-app="shopping-cart-app" ng-controller="shopping-cart-ctrl">
 	<div th:insert="~{common/header :: header}"></div>
 	<br>
 	<br>
@@ -21,20 +21,20 @@
 				<div th:if="${detailProduct}">
 					<div class="row">
 						<div class="col-6">
-							<img th:src="@{|/image/${detailProduct.productImage}|}"
+							<img th:src="@{|/image/${detailProduct.image}|}"
 								alt="Ảnh sản phẩm" class="img-thumbnail"
 								style="width: 595px; height: 595px">
 						</div>
 						<div class="col-6">
 							<p>
-								<span class="h5" th:text="${detailProduct.productName}"></span>
+								<span class="h5" th:text="${detailProduct.name}"></span>
 								<br> <br> <span class="h6"
-									th:text="${detailProduct.productPrice}+'$'"></span> <br> <br>
+									th:text="${detailProduct.price}+'$'"></span> <br> <br>
 								<strong>Mô tả sản phẩm:</strong> <span
-									th:text="${detailProduct.productDescription}"></span>
+									th:text="${detailProduct.description}"></span>
 							</p>
 							<hr>
-							<a th:attr="ng-click=@{|cart.add(${detailProduct.productId})|} "
+							<a th:attr="ng-click=@{|cart.add(${detailProduct.id})|} "
 								class=" btn btn-primary ">Thêm vào giỏ hàng</a>
 							<button class="btn btn-warning">Mua ngay</button>
 							<br> <br>

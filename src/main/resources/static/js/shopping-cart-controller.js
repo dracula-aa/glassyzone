@@ -1,67 +1,63 @@
-const app = angular.module("shopping-cart-app", []);
+var app = angular.module("shopping-cart-app", []);
 
-app.controller("shopping-cart-ctrl", function($scope, $rootScope, $http) {
-	 var cartCtrl = this;
-	$scope.cart = {
-        items: [],
-         add(id) {
+app.controller("shopping-cart-ctrl", function ($scope, $http) {
+    $scope.items = [];
+    $scope.cart = {
+        add: function (id) {
             var item = this.items.find(item => item.id == id);
+
             if (item) {
                 item.qty++;
                 this.saveToLocalStorage();
-            }
-            else {
-                $http.get(`/product/${id}`).then(resp => {
+                alert("Đã thêm thành công sản phẩm vào giỏ hàng!");
+            } else {
+                $http.get("/product/" + id).then(function (resp) {
                     resp.data.qty = 1;
-                    this.items.push(resp.data);
-                    this.saveToLocalStorage();
-                })
+                    $scope.cart.items.push(resp.data);
+                    $scope.cart.saveToLocalStorage();
+                    alert("Đã thêm thành công sản phẩm vào giỏ hàng!");
+                });
             }
         },
 
-        remove: function(id) {
-            var index = this.items.findIndex(item => item.id == id);
+        remove: function (id) {
+            var index = this.items.findIndex(function (item) {
+                return item.id == id;
+            });
+
             if (index !== -1) {
                 this.items.splice(index, 1);
-                this.saveToLocalStorage();
             }
+            $scope.cart.saveToLocalStorage();
         },
 
-        clear: function() {
+        clear: function () {
             this.items = [];
-            this.saveToLocalStorage();
+            $scope.cart.saveToLocalStorage();
         },
 
-        amt_of: function(item) {
+        amt_of: function (item) {
             return item.qty * item.productPrice;
         },
 
-        get count() {
-            return this.items.map(item => item.qty).reduce((total, qty) => total + qty, 0);
+        updateCartItem: function(item) {
+            item.qty = parseInt(item.qty); // Đảm bảo qty là một số nguyên
+            item.total = item.qty * item.productPrice;
+            this.saveToLocalStorage();
         },
 
-        get amount() {
-            return this.items
-                .map(item => item.qty * item.productPrice)
-                .reduce((total, qty) => total + qty, 0);
-        },
-
-        saveToLocalStorage: function() {
-            var json = JSON.stringify(angular.copy(this.items));
+        saveToLocalStorage: function () {
+            var json = JSON.stringify(this.items);
             localStorage.setItem("cart", json);
         },
 
-        loadFromLocalStorage: function() {
+        loadFromLocalStorage: function () {
             var json = localStorage.getItem("cart");
             this.items = json ? JSON.parse(json) : [];
-        },
-        
-       updateCartItem: function(item) {
-            item.qty = parseInt(item.qty); // Đảm bảo qty là một số nguyên
-            item.total = item.qty * item.productPrice;
-            $scope.cart.saveToLocalStorage();
         }
-
     };
+
+    // Load cart data from localStorage
     $scope.cart.loadFromLocalStorage();
+    $scope.cartLength = $scope.items.length;
 });

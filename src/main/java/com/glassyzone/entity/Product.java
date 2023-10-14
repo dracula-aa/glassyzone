@@ -28,18 +28,18 @@ import lombok.NoArgsConstructor;
 public class Product {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Integer productId;
+	Integer id;
 
 	@NotBlank
-	String productName;
+	String name;
 
-	String productImage;
+	String image;
 
-	String productDescription;
+	String description;
 
 	@NotNull
 	@PositiveOrZero
-	Double productPrice;
+	Double price;
 
 	@JsonIgnore
 	@ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)

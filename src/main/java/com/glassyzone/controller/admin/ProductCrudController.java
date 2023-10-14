@@ -53,7 +53,7 @@ public class ProductCrudController {
 	@PostMapping("/admin/products/create")
 	public String createProduct(Model model, @Validated @ModelAttribute("product") Product product, Errors errors,
 			@RequestParam("productImage") MultipartFile productImage) throws IllegalStateException, IOException {
-		if (product.getProductName().isBlank() || product.getProductPrice() == null
+		if (product.getName() == null || product.getPrice() == null
 				|| product.getCategoryName() == null) {
 			model.addAttribute("message", "Vui lòng điền thông tin hợp lệ!");
 		} else {
@@ -61,14 +61,13 @@ public class ProductCrudController {
 				String fileName = "product_" + UUID.randomUUID() + ".jpg";
 				Path imagePath = Paths.get("src/main/resources/static/image/" + fileName);
 				Files.write(imagePath, productImage.getBytes());
-				product.setProductImage(fileName);
+				product.setImage(fileName);
 			}
 
 		}
-		Product p = productDAO.findByProductName(product.getProductName());
+		Product p = productDAO.findByProductName(product.getName());
 		if (p == null) {
 			productDAO.save(product);
-			// Đẩy vào cơ sở dữ liệu qua API
 			restTemplate.postForObject("http://localhost:8080/product", product, Product.class);
 		} else {
 			model.addAttribute("message", "Tên sản phẩm đã tồn tại!");
@@ -87,15 +86,15 @@ public class ProductCrudController {
 	    Product existingProduct = response.getBody();
 
 	    if (existingProduct != null) {
-	        existingProduct.setProductName(product.getProductName());
-	        existingProduct.setProductPrice(product.getProductPrice());
-	        existingProduct.setProductDescription(product.getProductDescription());
+	        existingProduct.setName(product.getName());
+	        existingProduct.setPrice(product.getPrice());
+	        existingProduct.setDescription(product.getDescription());
 
 	        if (!productImage.isEmpty()) {
 	            String fileName = "product_" + UUID.randomUUID() + ".jpg";
 	            Path imagePath = Paths.get("src/main/resources/static/image/" + fileName);
 	            Files.write(imagePath, productImage.getBytes());
-	            existingProduct.setProductImage(fileName);
+	            existingProduct.setImage(fileName);
 	        }
 
 	        restTemplate.put("http://localhost:8080/product/" + id, existingProduct);
@@ -116,11 +115,11 @@ public class ProductCrudController {
 	@RequestMapping("/admin/products/edit/{id}")
 	public String editProduct(Model model, @PathVariable("id") Integer id, @ModelAttribute("product") Product product) {
 		Product p = productDAO.findById(id).get();
-		product.setProductId(p.getProductId());
-		product.setProductName(p.getProductName());
-		product.setProductImage(p.getProductImage());
-		product.setProductPrice(p.getProductPrice());
-		product.setProductDescription(p.getProductDescription());
+		product.setId(p.getId());
+		product.setName(p.getName());
+		product.setImage(p.getImage());
+		product.setPrice(p.getPrice());
+		product.setDescription(p.getDescription());
 		product.setCategoryName(p.getCategoryName());
 		loadAll(model);
 		return "admin/crud/product";

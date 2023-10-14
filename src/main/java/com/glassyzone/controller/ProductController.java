@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpSession;
 
+import com.glassyzone.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
@@ -19,7 +20,10 @@ import org.springframework.web.client.RestTemplate;
 
 import com.glassyzone.entity.Product;
 import com.glassyzone.repository.ProductDAO;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.web.bind.annotation.*;
 @Controller
 public class ProductController {
 	@Autowired
@@ -31,16 +35,21 @@ public class ProductController {
 	@Autowired
 	RestTemplate restTemplate;
 
+	@Autowired
+	ProductService productService;
 	@GetMapping("/products")
-	public String showProducts(Model model) {
-		// Gọi API để lấy danh sách sản phẩm
-		ResponseEntity<List<Product>> response = restTemplate.exchange("http://localhost:8080/product", HttpMethod.GET,
-				null, new ParameterizedTypeReference<List<Product>>() {
-				});
-		List<Product> products = response.getBody();
-		model.addAttribute("products", products);
-		return "product/product"; 
+	public String showProducts(Model model, @RequestParam(name = "page", defaultValue = "1") int page) {
+		int pageSize = 10; // Số sản phẩm trên mỗi trang
+		Page<Product> productPage = productService.findPaginated(page, pageSize);
+		List<Product> productList = productPage.getContent();
+
+		model.addAttribute("products", productList);
+		model.addAttribute("currentPage", page);
+		model.addAttribute("totalPages", productPage.getTotalPages());
+
+		return "product/product";
 	}
+
 
 	@GetMapping("/products/{id}")
 	public String detailProduct(Model model, @PathVariable("id") Integer id) {
